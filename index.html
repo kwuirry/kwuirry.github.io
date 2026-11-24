@@ -155,27 +155,7 @@
 
 <body>
 
-<script>
-const music = document.getElementById("backgroundMusic");
-
-// Try playing immediately when the page loads
-music.volume = 0.5;
-
-music.play().catch(() => {
-    console.log("Autoplay blocked. Waiting for user interaction.");
-
-    // Try again when the visitor clicks or presses a key
-    function startMusic() {
-        music.play();
-
-        document.removeEventListener("click", startMusic);
-        document.removeEventListener("keydown", startMusic);
-    }
-
-    document.addEventListener("click", startMusic);
-    document.addEventListener("keydown", startMusic);
-});
-</script>
+<audio src="music.mp3" autoplay loop></audio>
 
     <div class="crt-overlay" aria-hidden="true"></div>
 
