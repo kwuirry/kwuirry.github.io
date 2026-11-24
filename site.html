@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>kwuirry</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #140617;
+            color: #fff;
+            font-family: "Comic Sans MS", "Comic Sans", cursive;
+
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+            isolation: isolate;
+        }
+
+        /* crt scan lines */
+        .crt-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0.28;
+            background:
+                repeating-linear-gradient(
+                    to bottom,
+                    transparent 0px,
+                    transparent 3px,
+                    rgba(190, 145, 210, 0.16) 4px,
+                    transparent 5px
+                );
+            background-size: 100% 8px;
+            animation: scanlines 0.18s linear infinite;
+        }
+
+        /* bigger crt scan line lol */
+        .crt-overlay::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: -35%;
+            height: 30%;
+            background: linear-gradient(
+                to bottom,
+                transparent,
+                rgba(190, 125, 220, 0.055),
+                transparent
+            );
+            animation: scan-band 8s linear infinite;
+        }
+
+        @keyframes scanlines {
+            from { background-position: 0 0; }
+            to   { background-position: 0 8px; }
+        }
+
+        @keyframes scan-band {
+            from { transform: translateY(0); }
+            to   { transform: translateY(450vh); }
+        }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            background: #200A26;
+            border: 1px solid #302038;
+            border-radius: 20px;
+
+            width: 100%;
+            max-width: 420px;
+            padding: 35px;
+
+            text-align: center;
+        }
+
+        .profile-picture {
+            width: 110px;
+            height: 110px;
+            border-radius: 18px;
+            object-fit: cover;
+            border: 1px solid #333;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin: 20px 0 8px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .about {
+            color: #E1D1E7;
+            font-size: 14px;
+            line-height: 1.7;
+            margin: 25px 0;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #38253d;
+            margin: 25px 0;
+        }
+
+        .socials {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+
+        .socials a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+
+        .socials a:hover {
+            color: #b98bd0;
+        }
+
+        footer {
+            color: #75577e;
+            font-size: 11px;
+            margin-top: 30px;
+        }
+
+        /* Respect visitors who prefer reduced motion. */
+        @media (prefers-reduced-motion: reduce) {
+            .crt-overlay,
+            .crt-overlay::after {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="crt-overlay" aria-hidden="true"></div>
+
+    <main class="card">
+
+        <!-- pfp -->
+        <img
+            src="pfp.png"
+            alt="pfp"
+            class="profile-picture"
+        >
+
+        <!-- username -->
+        <h1>kwuirry</h1>
+
+        <div class="subtitle">
+            go eat a trashcan
+        </div>
+
+        <!-- about me -->
+        <p class="about">
+            hello;
+            my name is kwuirry, and i enjoy electronics,
+            cybersecurity, and minecraft.
+        </p>
+        kwuirry@proton.me
+
+        <hr class="divider">
+
+        <!-- socials -->
+        <div class="socials">
+            <a href="https://archive.org/details/@kwuirry">archive.org</a>
+            <a href="https://discord.com/users/1478176943357693952">discord</a>
+            <a href="https://youtube.com/@kwuirry">youtube</a>
+        </div>
+
+        </footer>
+
+    </main>
+
+</body>
+</html>
