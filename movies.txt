@@ -5,3 +5,7 @@ MOVIE https://archive.org/details/the-hunger-games_202611
 NAME The Hunger Games: Catching Fire
 COVER https://image.tmdb.org/t/p/original/eZErsoRjOW7aqTBrxGHoHQ7BeWs.jpg
 MOVIE https://archive.org/details/jogos-vorazes-em-chamas
+
+NAME The Lord of the Rings: The Fellowship of the Ring
+COVER https://zm1.kmmovies.bond/the-lord-of-the-rings-the-fellowship-of-the-ring-2001/
+MOVIE https://7movies.ws/movie/120/watch
