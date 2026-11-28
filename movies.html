@@ -49,7 +49,8 @@ body {
     color: #b98bd0;
 }
 
-/* crt scan lines */
+/* CRT effect */
+
 .crt-overlay {
     position: fixed;
     inset: 0;
@@ -69,7 +70,6 @@ body {
     animation: scanlines 0.18s linear infinite;
 }
 
-/* bigger crt scan line lol */
 .crt-overlay::after {
     content: "";
     position: absolute;
@@ -104,7 +104,7 @@ body {
     margin: 0 auto;
 }
 
-/* search */
+/* Search */
 
 .movie-search {
     width: 100%;
@@ -132,7 +132,7 @@ body {
     border-color: #b98bd0;
 }
 
-/* movie grid */
+/* Movie grid */
 
 .movie-grid {
     display: grid;
@@ -177,7 +177,7 @@ body {
     margin-top: 25px;
 }
 
-/* movie player overlay */
+/* Player overlay */
 
 .movie-overlay {
     position: fixed;
@@ -237,13 +237,20 @@ body {
     flex: 1;
     min-height: 0;
     background: #000;
+    position: relative;
 }
 
-.movie-screen iframe {
+.movie-screen iframe,
+.movie-screen video {
     width: 100%;
     height: 100%;
     border: none;
     display: block;
+    background: #000;
+}
+
+.movie-screen video {
+    object-fit: contain;
 }
 
 @media (max-width: 600px) {
@@ -260,8 +267,6 @@ body {
         gap: 16px;
     }
 }
-
-/* reduced motion support */
 
 @media (prefers-reduced-motion: reduce) {
     .crt-overlay,
@@ -308,14 +313,20 @@ body {
             <button id="close-player" aria-label="Close player">&times;</button>
         </div>
 
-        <div class="movie-screen">
+        <div class="movie-screen" id="movie-screen">
             <iframe
                 id="player-frame"
                 allowfullscreen
-                webkitallowfullscreen
-                mozallowfullscreen
                 allow="autoplay; fullscreen"
             ></iframe>
+
+            <video
+                id="player-video"
+                controls
+                playsinline
+                preload="metadata"
+                hidden
+            ></video>
         </div>
 
     </div>
@@ -343,8 +354,7 @@ async function loadMovies() {
             return match ? match[1] : value.trim();
         }
 
-        // Each NAME line begins a new movie.
-        // Blank lines are optional.
+        // Parse movies. Every NAME starts a new entry.
         const movies = [];
         let movie = {};
 
@@ -370,7 +380,6 @@ async function loadMovies() {
             movie[key] = key === "NAME" ? value : getURL(value);
         }
 
-        // Add the final movie.
         if (movie.NAME && movie.COVER && movie.MOVIE) {
             movies.push(movie);
         }
@@ -396,33 +405,7 @@ async function loadMovies() {
 
             card.addEventListener("click", event => {
                 event.preventDefault();
-
-                try {
-                    const identifier = new URL(movie.MOVIE)
-                        .pathname
-                        .split("/")
-                        .filter(Boolean)
-                        .pop();
-
-                    if (!identifier) {
-                        throw new Error("Invalid Archive.org URL");
-                    }
-
-                    document.getElementById("player-title").textContent =
-                        movie.NAME;
-
-                    document.getElementById("player-frame").src =
-                        `https://archive.org/embed/${encodeURIComponent(identifier)}`;
-
-                    document.getElementById("movie-overlay").hidden = false;
-                    document.body.style.overflow = "hidden";
-
-                    // Pause background music when a movie opens.
-                    document.getElementById("background-music").pause();
-
-                } catch (error) {
-                    console.error("Could not open movie:", error);
-                }
+                openMovie(movie);
             });
 
             grid.appendChild(card);
@@ -461,9 +444,72 @@ async function loadMovies() {
     }
 }
 
+function openMovie(movie) {
+    const overlay = document.getElementById("movie-overlay");
+    const frame = document.getElementById("player-frame");
+    const video = document.getElementById("player-video");
+    const music = document.getElementById("background-music");
+
+    const movieURL = new URL(movie.MOVIE);
+    const hostname = movieURL.hostname.toLowerCase();
+
+    document.getElementById("player-title").textContent = movie.NAME;
+
+    // Stop any previous movie.
+    frame.src = "";
+    video.pause();
+    video.removeAttribute("src");
+    video.load();
+
+    // Pause background music.
+    music.pause();
+
+    // Archive.org links use the Archive.org embed player.
+    if (hostname === "archive.org" || hostname.endsWith(".archive.org")) {
+        const parts = movieURL.pathname.split("/").filter(Boolean);
+
+        if (parts[0] === "details" && parts[1]) {
+            frame.src = "https://archive.org/embed/" +
+                encodeURIComponent(parts[1]);
+        } else if (parts[0] === "embed" && parts[1]) {
+            frame.src = movieURL.href;
+        } else {
+            frame.src = movieURL.href;
+        }
+
+        frame.hidden = false;
+        video.hidden = true;
+
+    } else {
+        // Other URLs are treated as direct video sources.
+        frame.hidden = true;
+        video.hidden = false;
+        video.src = movie.MOVIE;
+
+        video.play().catch(error => {
+            console.log("Playback needs user interaction:", error);
+        });
+    }
+
+    overlay.hidden = false;
+    document.body.style.overflow = "hidden";
+}
+
 function closeMoviePlayer() {
-    document.getElementById("movie-overlay").hidden = true;
-    document.getElementById("player-frame").src = "";
+    const overlay = document.getElementById("movie-overlay");
+    const frame = document.getElementById("player-frame");
+    const video = document.getElementById("player-video");
+
+    overlay.hidden = true;
+
+    // Stop the video completely.
+    video.pause();
+    video.removeAttribute("src");
+    video.load();
+
+    // Stop the Archive.org player.
+    frame.src = "";
+
     document.body.style.overflow = "";
 }
 
