@@ -63,64 +63,30 @@
     <a href="games.html">games</a>
 </nav>
 
+
 <main class="page-content">
     <div id="movie-grid" class="movie-grid"></div>
     <p id="movie-status">loading movies...</p>
 </main>
 
-<style>
-    .movie-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 24px;
-        width: 100%;
-        max-width: 900px;
-        margin: 30px auto;
-    }
+<div id="movie-overlay" class="movie-overlay" hidden>
+    <div class="movie-window">
+        <div class="movie-header">
+            <span id="player-title"></span>
+            <button id="close-player" aria-label="Close player">&times;</button>
+        </div>
 
-    .movie-card {
-        color: white;
-        text-decoration: none;
-        text-align: center;
-        transition: transform 0.2s;
-    }
-
-    .movie-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .movie-card img {
-        display: block;
-        width: 100%;
-        aspect-ratio: 2 / 3;
-        object-fit: cover;
-        border-radius: 10px;
-        background: #281E30;
-    }
-
-    .movie-card p {
-        margin-top: 10px;
-        font-size: 15px;
-    }
-</style>
-
-
-<main class="page-content">
-    <div id="movie-grid" class="movie-grid"></div>
-
-    <div id="movie-player" class="movie-player" hidden>
-        <h2 id="player-title"></h2>
-        <iframe
-            id="player-frame"
-            allowfullscreen
-            webkitallowfullscreen
-            mozallowfullscreen
-            allow="autoplay; fullscreen"
-        ></iframe>
+        <div class="movie-screen">
+            <iframe
+                id="player-frame"
+                allowfullscreen
+                webkitallowfullscreen
+                mozallowfullscreen
+                allow="autoplay; fullscreen"
+            ></iframe>
+        </div>
     </div>
-
-    <p id="movie-status">loading movies...</p>
-</main>
+</div>
 
 <style>
     .movie-grid {
@@ -159,24 +125,82 @@
         font-size: 15px;
     }
 
-    .movie-player {
-        width: 100%;
-        max-width: 900px;
-        margin: 40px auto;
-        text-align: center;
+    /* movie player overlay */
+    .movie-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2vw;
     }
 
-    .movie-player iframe {
+    .movie-overlay[hidden] {
+        display: none;
+    }
+
+    .movie-window {
         width: 100%;
-        aspect-ratio: 16 / 9;
+        height: 100%;
+        background: #1E1824;
+        border: 1px solid #49364F;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .movie-header {
+        height: 48px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        background: #281E30;
+        color: white;
+        border-bottom: 1px solid #49364F;
+        font-size: 14px;
+    }
+
+    .movie-header button {
         border: none;
-        border-radius: 10px;
+        background: transparent;
+        color: white;
+        font-size: 26px;
+        cursor: pointer;
+        padding: 0 4px;
+        line-height: 1;
+    }
+
+    .movie-header button:hover {
+        color: #b98bd0;
+    }
+
+    .movie-screen {
+        flex: 1;
+        min-height: 0;
         background: #000;
     }
 
-    .movie-player h2 {
-        font-size: 20px;
-        margin-bottom: 15px;
+    .movie-screen iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+
+    @media (max-width: 600px) {
+        .movie-overlay {
+            padding: 8px;
+        }
+
+        .movie-window {
+            border-radius: 6px;
+        }
     }
 </style>
 
@@ -184,6 +208,9 @@
 async function loadMovies() {
     const grid = document.getElementById("movie-grid");
     const status = document.getElementById("movie-status");
+
+    status.hidden = false;
+    status.textContent = "loading movies...";
 
     try {
         const response = await fetch("movies.txt");
@@ -220,7 +247,7 @@ async function loadMovies() {
         movies.forEach(movie => {
             const card = document.createElement("a");
             card.className = "movie-card";
-            card.href = "#movie-player";
+            card.href = "#";
 
             const image = document.createElement("img");
             image.src = movie.COVER;
@@ -235,31 +262,55 @@ async function loadMovies() {
             card.addEventListener("click", event => {
                 event.preventDefault();
 
-                const player = document.getElementById("movie-player");
-                const frame = document.getElementById("player-frame");
-
                 const identifier = new URL(movie.MOVIE).pathname
                     .split("/")
                     .filter(Boolean)
                     .pop();
 
-                frame.src = `https://archive.org/embed/${encodeURIComponent(identifier)}`;
                 document.getElementById("player-title").textContent = movie.NAME;
+                document.getElementById("player-frame").src =
+                    `https://archive.org/embed/${encodeURIComponent(identifier)}`;
 
-                player.hidden = false;
-                player.scrollIntoView({ behavior: "smooth", block: "start" });
+                document.getElementById("movie-overlay").hidden = false;
+                document.body.style.overflow = "hidden";
             });
 
             grid.appendChild(card);
         });
 
-        status.textContent = movies.length ? "" : "nothing to show :(";
+        status.hidden = true;
+
+        if (movies.length === 0) {
+            status.hidden = false;
+            status.textContent = "nothing to show :(";
+        }
 
     } catch (error) {
+        status.hidden = false;
         status.textContent = "couldn't load movies :(";
         console.error(error);
     }
 }
+
+function closeMoviePlayer() {
+    document.getElementById("movie-overlay").hidden = true;
+    document.getElementById("player-frame").src = "";
+    document.body.style.overflow = "";
+}
+
+document.getElementById("close-player").addEventListener("click", closeMoviePlayer);
+
+document.getElementById("movie-overlay").addEventListener("click", event => {
+    if (event.target.id === "movie-overlay") {
+        closeMoviePlayer();
+    }
+});
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+        closeMoviePlayer();
+    }
+});
 
 loadMovies();
 </script>
