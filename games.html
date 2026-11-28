@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>games</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1E1824;
+            color: #fff;
+            font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", "Comic Neue", sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+            isolation: isolate;
+        }
+
+        .top-nav {
+            position: fixed;
+            top: 20px;
+            left: 0;
+            right: 0;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+        }
+
+        .top-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .top-nav a:hover,
+        .top-nav a.active {
+            color: #b98bd0;
+        }
+
+        .empty-message {
+            position: relative;
+            z-index: 1;
+            font-size: 16px;
+            color: #fff;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<nav class="top-nav">
+    <a href="index.html">home</a>
+    <a href="movies.html">movies</a>
+    <a href="games.html" class="active">games</a>
+</nav>
+<main class="empty-message">nothing to show :(</main>
+</body>
+</html>
