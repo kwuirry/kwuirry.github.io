@@ -1,9 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>games</title>
+
     <style>
         * {
             box-sizing: border-box;
@@ -47,6 +49,53 @@
             color: #b98bd0;
         }
 
+        /* crt scan lines */
+        .crt-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+            opacity: 0.28;
+            background:
+                repeating-linear-gradient(
+                    to bottom,
+                    transparent 0px,
+                    transparent 3px,
+                    rgba(190, 145, 210, 0.16) 4px,
+                    transparent 5px
+                );
+            background-size: 100% 8px;
+            animation: scanlines 0.18s linear infinite;
+        }
+
+        /* bigger crt scan line lol */
+        .crt-overlay::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: -35%;
+            height: 30%;
+            background: linear-gradient(
+                to bottom,
+                transparent,
+                rgba(190, 125, 220, 0.055),
+                transparent
+            );
+            animation: scan-band 8s linear infinite;
+        }
+
+        @keyframes scanlines {
+            from { background-position: 0 0; }
+            to   { background-position: 0 8px; }
+        }
+
+        @keyframes scan-band {
+            from { transform: translateY(0); }
+            to   { transform: translateY(450vh); }
+        }
+
         .empty-message {
             position: relative;
             z-index: 1;
@@ -54,14 +103,30 @@
             color: #fff;
             text-align: center;
         }
+
+        /* reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            .crt-overlay,
+            .crt-overlay::after {
+                animation: none;
+            }
+        }
     </style>
 </head>
+
 <body>
+
 <nav class="top-nav">
     <a href="index.html">home</a>
     <a href="movies.html">movies</a>
     <a href="games.html" class="active">games</a>
 </nav>
+
+<audio src="music.mp3" autoplay loop></audio>
+
+<div class="crt-overlay" aria-hidden="true"></div>
+
 <main class="empty-message">nothing to show :(</main>
+
 </body>
 </html>
