@@ -1,0 +1,3 @@
+NAME The Hunger Games
+COVER https://image.tmdb.org/t/p/original/2sFf8HRYSOE5xqhSAG2VMjYGfNy.jpg
+MOVIE https://archive.org/details/the-hunger-games_202611
