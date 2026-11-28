@@ -62,6 +62,116 @@
     <a href="movies.html" class="active">movies</a>
     <a href="games.html">games</a>
 </nav>
-<main class="empty-message">nothing to show :(</main>
+
+<main class="page-content">
+    <div id="movie-grid" class="movie-grid"></div>
+    <p id="movie-status">loading movies...</p>
+</main>
+
+<style>
+    .movie-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 24px;
+        width: 100%;
+        max-width: 900px;
+        margin: 30px auto;
+    }
+
+    .movie-card {
+        color: white;
+        text-decoration: none;
+        text-align: center;
+        transition: transform 0.2s;
+    }
+
+    .movie-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .movie-card img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 2 / 3;
+        object-fit: cover;
+        border-radius: 10px;
+        background: #281E30;
+    }
+
+    .movie-card p {
+        margin-top: 10px;
+        font-size: 15px;
+    }
+</style>
+
+<script>
+async function loadMovies() {
+    const grid = document.getElementById("movie-grid");
+    const status = document.getElementById("movie-status");
+
+    try {
+        const response = await fetch("movies.txt");
+
+        if (!response.ok) {
+            throw new Error("Could not load movies.txt");
+        }
+
+        const text = await response.text();
+
+        const getURL = value => {
+            const match = value.match(/\((https?:\/\/[^)]+)\)/);
+            return match ? match[1] : value.trim();
+        };
+
+        const movies = text.trim().split(/\n\s*\n/).map(block => {
+            const movie = {};
+
+            block.split(/\r?\n/).forEach(line => {
+                const separator = line.indexOf(" ");
+                if (separator === -1) return;
+
+                const key = line.slice(0, separator).trim();
+                const value = line.slice(separator + 1).trim();
+
+                movie[key] = key === "NAME" ? value : getURL(value);
+            });
+
+            return movie;
+        }).filter(movie => movie.NAME && movie.COVER && movie.MOVIE);
+
+        grid.replaceChildren();
+
+        movies.forEach(movie => {
+            const card = document.createElement("a");
+            card.className = "movie-card";
+            card.href = movie.MOVIE;
+            card.target = "_blank";
+            card.rel = "noopener noreferrer";
+
+            const image = document.createElement("img");
+            image.src = movie.COVER;
+            image.alt = movie.NAME;
+            image.loading = "lazy";
+
+            const title = document.createElement("p");
+            title.textContent = movie.NAME;
+
+            card.append(image, title);
+            grid.appendChild(card);
+        });
+
+        status.textContent = movies.length
+            ? ""
+            : "nothing to show :(";
+
+    } catch (error) {
+        status.textContent = "couldn't load movies :(";
+        console.error(error);
+    }
+}
+
+loadMovies();
+</script>
+
 </body>
 </html>
