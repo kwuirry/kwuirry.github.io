@@ -4,4 +4,4 @@ MOVIE https://archive.org/details/the-hunger-games_202611
 
 NAME The Hunger Games: Catching Fire
 COVER https://image.tmdb.org/t/p/original/eZErsoRjOW7aqTBrxGHoHQ7BeWs.jpg
-MOVIE https://archive.org/details/jogos-vorazes-em-chamas/
+MOVIE https://archive.org/details/jogos-vorazes-em-chamas
