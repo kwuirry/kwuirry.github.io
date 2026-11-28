@@ -104,6 +104,82 @@
     }
 </style>
 
+
+<main class="page-content">
+    <div id="movie-grid" class="movie-grid"></div>
+
+    <div id="movie-player" class="movie-player" hidden>
+        <h2 id="player-title"></h2>
+        <iframe
+            id="player-frame"
+            allowfullscreen
+            webkitallowfullscreen
+            mozallowfullscreen
+            allow="autoplay; fullscreen"
+        ></iframe>
+    </div>
+
+    <p id="movie-status">loading movies...</p>
+</main>
+
+<style>
+    .movie-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, 160px);
+        justify-content: center;
+        gap: 24px;
+        width: 100%;
+        max-width: 900px;
+        margin: 30px auto;
+    }
+
+    .movie-card {
+        color: white;
+        text-decoration: none;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .movie-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .movie-card img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 2 / 3;
+        object-fit: cover;
+        border-radius: 10px;
+        background: #281E30;
+    }
+
+    .movie-card p {
+        margin-top: 10px;
+        font-size: 15px;
+    }
+
+    .movie-player {
+        width: 100%;
+        max-width: 900px;
+        margin: 40px auto;
+        text-align: center;
+    }
+
+    .movie-player iframe {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border: none;
+        border-radius: 10px;
+        background: #000;
+    }
+
+    .movie-player h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+</style>
+
 <script>
 async function loadMovies() {
     const grid = document.getElementById("movie-grid");
@@ -144,9 +220,7 @@ async function loadMovies() {
         movies.forEach(movie => {
             const card = document.createElement("a");
             card.className = "movie-card";
-            card.href = movie.MOVIE;
-            card.target = "_blank";
-            card.rel = "noopener noreferrer";
+            card.href = "#movie-player";
 
             const image = document.createElement("img");
             image.src = movie.COVER;
@@ -157,12 +231,29 @@ async function loadMovies() {
             title.textContent = movie.NAME;
 
             card.append(image, title);
+
+            card.addEventListener("click", event => {
+                event.preventDefault();
+
+                const player = document.getElementById("movie-player");
+                const frame = document.getElementById("player-frame");
+
+                const identifier = new URL(movie.MOVIE).pathname
+                    .split("/")
+                    .filter(Boolean)
+                    .pop();
+
+                frame.src = `https://archive.org/embed/${encodeURIComponent(identifier)}`;
+                document.getElementById("player-title").textContent = movie.NAME;
+
+                player.hidden = false;
+                player.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+
             grid.appendChild(card);
         });
 
-        status.textContent = movies.length
-            ? ""
-            : "nothing to show :(";
+        status.textContent = movies.length ? "" : "nothing to show :(";
 
     } catch (error) {
         status.textContent = "couldn't load movies :(";
