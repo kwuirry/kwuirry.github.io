@@ -1,76 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>movies</title>
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>movies</title>
 
-        body {
-            background: #1E1824;
-            color: #fff;
-            font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", "Comic Neue", sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-            padding: 20px;
-            overflow: hidden;
-            position: relative;
-            isolation: isolate;
-        }
+<style>
+* {
+    box-sizing: border-box;
+}
 
-        .top-nav {
-            position: fixed;
-            top: 20px;
-            left: 0;
-            right: 0;
-            z-index: 2;
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-        }
+body {
+    background: #1E1824;
+    color: #fff;
+    font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", "Comic Neue", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+    margin: 0;
+    padding: 80px 20px 30px;
+    overflow-x: hidden;
+    position: relative;
+    isolation: isolate;
+}
 
-        .top-nav a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.2s;
-        }
+.top-nav {
+    position: fixed;
+    top: 20px;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+}
 
-        .top-nav a:hover,
-        .top-nav a.active {
-            color: #b98bd0;
-        }
+.top-nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+}
 
-        .empty-message {
-            position: relative;
-            z-index: 1;
-            font-size: 16px;
-            color: #fff;
-            text-align: center;
-        }
-    </style>
+.top-nav a:hover,
+.top-nav a.active {
+    color: #b98bd0;
+}
+
+.page-content {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* search */
+
+.movie-search {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto 30px;
+}
+
+.movie-search input {
+    width: 100%;
+    padding: 12px 16px;
+    background: #281E30;
+    color: white;
+    border: 1px solid #49364F;
+    border-radius: 8px;
+    outline: none;
+    font-family: inherit;
+    font-size: 15px;
+}
+
+.movie-search input::placeholder {
+    color: #a99bad;
+}
+
+.movie-search input:focus {
+    border-color: #b98bd0;
+}
+
+/* movie grid */
+
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 160px);
+    justify-content: center;
+    gap: 24px;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.movie-card {
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.movie-card:hover {
+    transform: translateY(-5px);
+}
+
+.movie-card img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border-radius: 10px;
+    background: #281E30;
+}
+
+.movie-card p {
+    margin-top: 10px;
+    font-size: 15px;
+}
+
+#movie-status {
+    text-align: center;
+    font-size: 16px;
+    color: #fff;
+    margin-top: 25px;
+}
+
+/* movie player overlay */
+
+.movie-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2vw;
+}
+
+.movie-overlay[hidden] {
+    display: none;
+}
+
+.movie-window {
+    width: 100%;
+    height: 100%;
+    background: #1E1824;
+    border: 1px solid #49364F;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+}
+
+.movie-header {
+    height: 48px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    background: #281E30;
+    color: white;
+    border-bottom: 1px solid #49364F;
+    font-size: 14px;
+}
+
+.movie-header button {
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 26px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+.movie-header button:hover {
+    color: #b98bd0;
+}
+
+.movie-screen {
+    flex: 1;
+    min-height: 0;
+    background: #000;
+}
+
+.movie-screen iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+}
+
+@media (max-width: 600px) {
+    .movie-overlay {
+        padding: 8px;
+    }
+
+    .movie-window {
+        border-radius: 6px;
+    }
+
+    .movie-grid {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 160px));
+        gap: 16px;
+    }
+}
+</style>
 </head>
+
 <body>
+
 <nav class="top-nav">
     <a href="index.html">home</a>
     <a href="movies.html" class="active">movies</a>
     <a href="games.html">games</a>
 </nav>
 
-
 <main class="page-content">
+
+    <div class="movie-search">
+        <input
+            type="search"
+            id="movie-search"
+            placeholder="search movies..."
+            autocomplete="off"
+        >
+    </div>
+
     <div id="movie-grid" class="movie-grid"></div>
     <p id="movie-status">loading movies...</p>
+
 </main>
 
 <div id="movie-overlay" class="movie-overlay" hidden>
     <div class="movie-window">
+
         <div class="movie-header">
             <span id="player-title"></span>
             <button id="close-player" aria-label="Close player">&times;</button>
@@ -85,132 +255,15 @@
                 allow="autoplay; fullscreen"
             ></iframe>
         </div>
+
     </div>
 </div>
-
-<style>
-    .movie-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, 160px);
-        justify-content: center;
-        gap: 24px;
-        width: 100%;
-        max-width: 900px;
-        margin: 30px auto;
-    }
-
-    .movie-card {
-        color: white;
-        text-decoration: none;
-        text-align: center;
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
-
-    .movie-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .movie-card img {
-        display: block;
-        width: 100%;
-        aspect-ratio: 2 / 3;
-        object-fit: cover;
-        border-radius: 10px;
-        background: #281E30;
-    }
-
-    .movie-card p {
-        margin-top: 10px;
-        font-size: 15px;
-    }
-
-    /* movie player overlay */
-    .movie-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 9999;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2vw;
-    }
-
-    .movie-overlay[hidden] {
-        display: none;
-    }
-
-    .movie-window {
-        width: 100%;
-        height: 100%;
-        background: #1E1824;
-        border: 1px solid #49364F;
-        border-radius: 8px;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
-    }
-
-    .movie-header {
-        height: 48px;
-        min-height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 16px;
-        background: #281E30;
-        color: white;
-        border-bottom: 1px solid #49364F;
-        font-size: 14px;
-    }
-
-    .movie-header button {
-        border: none;
-        background: transparent;
-        color: white;
-        font-size: 26px;
-        cursor: pointer;
-        padding: 0 4px;
-        line-height: 1;
-    }
-
-    .movie-header button:hover {
-        color: #b98bd0;
-    }
-
-    .movie-screen {
-        flex: 1;
-        min-height: 0;
-        background: #000;
-    }
-
-    .movie-screen iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-        display: block;
-    }
-
-    @media (max-width: 600px) {
-        .movie-overlay {
-            padding: 8px;
-        }
-
-        .movie-window {
-            border-radius: 6px;
-        }
-    }
-</style>
 
 <script>
 async function loadMovies() {
     const grid = document.getElementById("movie-grid");
     const status = document.getElementById("movie-status");
-
-    status.hidden = false;
-    status.textContent = "loading movies...";
+    const search = document.getElementById("movie-search");
 
     try {
         const response = await fetch("movies.txt");
@@ -244,6 +297,8 @@ async function loadMovies() {
 
         grid.replaceChildren();
 
+        const cards = [];
+
         movies.forEach(movie => {
             const card = document.createElement("a");
             card.className = "movie-card";
@@ -268,6 +323,7 @@ async function loadMovies() {
                     .pop();
 
                 document.getElementById("player-title").textContent = movie.NAME;
+
                 document.getElementById("player-frame").src =
                     `https://archive.org/embed/${encodeURIComponent(identifier)}`;
 
@@ -276,14 +332,35 @@ async function loadMovies() {
             });
 
             grid.appendChild(card);
+            cards.push({ card, movie });
         });
 
-        status.hidden = true;
+        function filterMovies() {
+            const query = search.value.toLowerCase().trim();
+            let visible = 0;
 
-        if (movies.length === 0) {
-            status.hidden = false;
-            status.textContent = "nothing to show :(";
+            cards.forEach(({ card, movie }) => {
+                const matches = movie.NAME.toLowerCase().includes(query);
+
+                card.hidden = !matches;
+
+                if (matches) visible++;
+            });
+
+            if (movies.length === 0) {
+                status.textContent = "nothing to show :(";
+                status.hidden = false;
+            } else if (visible === 0) {
+                status.textContent = "no movies found :(";
+                status.hidden = false;
+            } else {
+                status.hidden = true;
+            }
         }
+
+        search.addEventListener("input", filterMovies);
+
+        filterMovies();
 
     } catch (error) {
         status.hidden = false;
